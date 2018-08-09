@@ -5,8 +5,11 @@ import akka.event.LoggingAdapter
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import akka.http.scaladsl.Http
+import com.assignment.db.AppDatabase
+import com.outworkers.phantom.dsl._
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import routes.Routes
 
@@ -18,6 +21,8 @@ object Main extends App with Routes {
   val settings = Settings(system)
 
   val log: LoggingAdapter = system.log
+  val appDb: AppDatabase = AppDatabase(settings)
+  appDb.create(30.seconds)
 
   val bindingFuture = Http().bindAndHandle(routes, settings.server.host, settings.server.port).onComplete {
     case Success(binding) =>
