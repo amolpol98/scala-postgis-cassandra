@@ -6,6 +6,8 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import akka.http.scaladsl.Http
 import com.assignment.db.AppDatabase
+import com.assignment.db.PostGISImpl
+import com.assignment.services.PostGISService
 import com.outworkers.phantom.dsl._
 
 import scala.concurrent.ExecutionContext
@@ -23,6 +25,8 @@ object Main extends App with Routes {
   val log: LoggingAdapter = system.log
   val appDb: AppDatabase = AppDatabase(settings)
   appDb.create(30.seconds)
+
+  override val postGISService: PostGISService = PostGISService(appDb.postGISItems)
 
   val bindingFuture = Http().bindAndHandle(routes, settings.server.host, settings.server.port).onComplete {
     case Success(binding) =>
